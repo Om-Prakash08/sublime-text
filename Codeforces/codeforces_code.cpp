@@ -128,16 +128,17 @@ ll pow(int x)
 
 
 bool check_prime(int n)
-{   if(n==1)
- return false ;
- for (int i = 2; i * i <= n; i++)
- {
-    if (n % i == 0)
-    {
+{
+    if(n == 1)
         return false ;
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            return false ;
+        }
     }
-}
-return true ;
+    return true ;
 }
 
 
@@ -167,31 +168,33 @@ return true ;
 //     ans=(ans+temp)%mod ;
 //     return ans ;
 // }
-void dfs(vector<vector<int>> &v, int i, bool visited[], stack<int> &s)
-{
-    visited[i] = true ;
-    for(auto x : v[i])
-    {
-        if(visited[x] == false)
-        {
-            dfs(v, x, visited, s) ;
-        }
-    }
-    s.push(i) ;
-}
-void dfsutil(vector<vector<int>> &v, bool visited[], int i, vector<int> &ans)
-{
-    visited[i] = true ;
-    ans.push_back(i + 1) ;
-    for(auto x : v[i])
-    {
-        if(visited[x] == false)
-        {
-            dfsutil(v, visited, x, ans) ;
-        }
-    }
-}
-// const int maxm = 100001 ;
+
+// void dfs(vector<vector<int>> &v, int i, bool visited[], stack<int> &s)
+// {
+//     visited[i] = true ;
+//     for(auto x : v[i])
+//     {
+//         if(visited[x] == false)
+//         {
+//             dfs(v, x, visited, s) ;
+//         }
+//     }
+//     s.push(i) ;
+// }
+// void dfsutil(vector<vector<int>> &v, bool visited[], int i, vector<int> &ans)
+// {
+//     visited[i] = true ;
+//     ans.push_back(i + 1) ;
+//     for(auto x : v[i])
+//     {
+//         if(visited[x] == false)
+//         {
+//             dfsutil(v, visited, x, ans) ;
+//         }
+//     }
+// }
+
+// const int maxm = 200001 ;
 // int parent[maxm], size_[maxm] ;
 // int parent1[maxm], size_1[maxm] ;
 // int find_set(int v)
@@ -221,42 +224,40 @@ void dfsutil(vector<vector<int>> &v, bool visited[], int i, vector<int> &ans)
 //     }
 // }
 
-//#define int long long
-const int maxm=2*(int)(1e5)+2 ;
-int arr[maxm][32] ;
-void solveAnd(){
-    memset(arr,0,sizeof(arr)) ;
-    for(int i=0;i<maxm;i++)
-    {if(i==0)
-      {for(int j=0;j<32;j++){
-         arr[i][j]=1;
-      }}
-    else{
-    for(int j=0;j<32;j++){
-       if(((1<<j)&i)==0)
-         arr[i][j]=arr[i-1][j]+1  ;
-       else
-        arr[i][j]=arr[i-1][j] ;
-    }}
+#define int long long
+#define ppi pair<pair<int,int>,int>
+#define pi  pair<int,int>
+//const int maxm = 2 * (int)(1e5) + 2 ;
+
+int dp[501][501] ;
+
+int solve(int a[], int b[], int n, int l, int k ,int index){
+    if(dp[index][k]!=-1)
+        return dp[index][k] ;
+    if(index==n){
+      return 0 ;
     }
-
-    // for(int i=0;i<4;i++)
-    //  {
-    //     for(int j=0;j<32;j++)
-    //         cout<<arr[i][j]<<' ';
-    //     cout<<endl ;
-    //  }
+    int res=INT_MAX ;
+    for(int i=0;i<=k&&index+i+1<=n;i++){
+       if(index+i+1==n)
+         res=min(res,b[index]*(l-a[index])+solve(a,b,n,l,k-i,index+i+1)) ;
+       else
+        res=min(res,b[index]*(a[index+i+1]-a[index])+solve(a,b,n,l,k-i,index+i+1)) ;
+    }
+    return dp[index][k]=res ;
 }
+
 void main_()
-{    
-  int l ,r ;cin>>l>>r ;
-  int temp[32] ;
-  for(int i=0;i<32;i++)
-    temp[i]=arr[r][i]-arr[l-1][i] ;
-  cout<<*min_element(temp,temp+32)<<'\n' ;
+{   memset(dp,-1,sizeof(dp)) ;
+    int n, l, k ;
+    cin >> n >> l >> k ;
+    int a[n], b[n];
+    for(int i = 0; i < n; i++)
+        cin >> a[i] ;
+    for(int i = 0; i < n; i++)
+        cin >> b[i] ;
+    cout<<solve(a,b,n,l,k,0)<<'\n' ;      
 }
-
-
 
 
 signed main()
@@ -272,15 +273,13 @@ signed main()
 #endif
 
     int test = 1 ;
-    cin >> test ;
-    solveAnd() ;
+   // cin >> test ;
     while(test--)
     {
         main_();
     }
     return 0;
 }
-//run ctrl+shift+B
-//format alt+shift+F
-//Ctrl+Shift+Alt+Q: Quick Format.
-//Ctrl+Shift+Alt+S: Selected Format.
+//run    ctrl+shift+B
+//Shift+Alt+f: Quick Format.
+//Shift+Alt+s: Selected Format.
