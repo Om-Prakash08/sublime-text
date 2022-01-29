@@ -4,78 +4,135 @@ using namespace std;
 #define mod 1000000007
 #define pb push_back
 #define rep(i,a,b) for(int i=a ;i<b;i++)
-
 //#include <boost/functional/hash.hpp>
-/*
-int construct_segment_tree(int arr[] ,int st[] ,int start ,int end ,int index) //initial value start=0 ,end=n-1 ,index=0
-  { if(start=end)
-     {
-      st[index]= arr[start] ;
-      return st[index] ;
-     } int mid=(start+end)>>2 ;
-     st[index]=construct_segment_tree(arr,st,start,mid,2*index+1)+construct_segment_tree(arr,st,mid+1,end,2*index+2) ;
-     return st[index] ;
-  }
-int getsum(int st[] ,int qs ,int qe ,int start ,int end ,int index ) // initial  start=0 ,end=n-1 ,index=0
-{
-  if(start>qe||end<qs)
-    return 0 ;
-  if(start>=qs && end<=qe)
-     return st[index] ;
-   int mid=(start+end)>>2 ;
-   return getsum(st,qs,qe,start,mid,2*index+1)+getsum(st,qs,qe,,mid+1,end,2*index+2) ;
-}
-void upadaterec(int st[] ,int start ,int end ,int i ,int index ,int diff)
-{
-
-}*/
 
 
-/*auto Z_array_generate(string s)
- {
-  int n=s.size() ;
-  std::vector<int> z(n);
-  int l,r ;l=r=0 ;
-  for(int i=1;i<n;i++)
-  { if(i>r)
-       {l=r=i ;
-        while(r<n && s[r-l]==s[r] )
-            {r++ ;}
-        z[i]=r-l ;
-        r-- ;}
-    else{int index=i-l ;
-        if(z[index]<r-i+1)
-           {z[i]=z[index] ; }
-        else
-           {l=i ;
-           while(r<n && s[r-l]==s[r])
-               {r++ ;}
-           z[i]=r-l ;
-           r-- ;}
-      }
-  }
-  return z ;
- }
- void z_algorithm(string s ,string pat)
- {
-  string concate=pat+"$"+s ;
-  auto z=Z_array_generate(concate) ;
-  int n=s.size() ;
-  int m=pat.size() ;
-  for(int i=m;i<n+m+1;i++)
-    if(z[i]==m)
-      cout<<"pattern found at index-"<<i-(m+1)<<'\n';
-    cout<<endl;
- }*/
-void yes()
-{
-    cout << "YES" << '\n' ;
-}
-void no()
-{
-    cout << "NO" << '\n' ;
-}
 
+/************************************Segment Tree********************************************************************************************************************************************/
+class Segment_tree
+{
+    int construct_segment_tree(int arr[], int st[], int start, int end, int index) //initial value start=0 ,end=n-1 ,index=0
+    {
+        if(start = end)
+        {
+            st[index] = arr[start] ;
+            return st[index] ;
+        }
+        int mid = (start + end) >> 2 ;
+        st[index] = construct_segment_tree(arr, st, start, mid, 2 * index + 1) + construct_segment_tree(arr, st, mid + 1, end, 2 * index + 2) ;
+        return st[index] ;
+    }
+    int getsum(int st[], int qs, int qe, int start, int end, int index ) // initial  start=0 ,end=n-1 ,index=0
+    {
+        if(start > qe || end < qs)
+            return 0 ;
+        if(start >= qs && end <= qe)
+            return st[index] ;
+        int mid = (start + end) >> 2 ;
+        return getsum(st, qs, qe, start, mid, 2 * index + 1) + getsum(st, qs, qe, mid + 1, end, 2 * index + 2) ;
+    }
+    // void upadaterec(int st[], int start, int end, int i, int index, int diff)
+    // {
+
+    // }
+};
+/****************************************************************************************************************************************************************************/
+
+
+
+
+
+
+/*****************************************String Matching Alog**********************************************************************************************************************/
+class z_algorithm   //O(n+m) time and space 
+{
+public:
+    vector<int> Z_array_generate(string s)
+    {
+        int n = s.size() ;
+        vector<int> z(n,0); // z[i]:-length of longest substring starting at i which is also prefix of string s.
+                           // Example: s="AAAB" , z[4]={x,2,1,0}
+        for (int i = 1, l = 0, r = 0; i < n; i++)
+        {   // segment[l,r] is rightmost segment match with prefix segment[0,r-l]
+            if (i <= r)
+                z[i] = min (r - i + 1, z[i - l]);
+            while (i + z[i] < n && s[z[i]] == s[i + z[i]])
+                z[i]++;
+            if (i + z[i] - 1 > r)
+                l = i, r = i + z[i] - 1;
+        }
+        return z ;
+    }
+    void PrintAllOccurence(string s, string pat)
+    {
+        string concate = pat + "$" + s ;
+        auto z = Z_array_generate(concate) ;
+        int n = s.size() ;
+        int m = pat.size() ;
+        for(int i = m + 1; i < n + 2; i++)
+            if(z[i] == m)
+                cout << "pattern found at index-" << i - (m + 1) << '\n';
+        cout << endl;
+    }
+    bool isFind(string s, string pat)
+    {
+        string concate = pat + "$" + s ;
+        auto z = Z_array_generate(concate) ;
+        int n = s.size() ;
+        int m = pat.size() ;
+        for(int i = m + 1; i < n + 2; i++)
+            if(z[i] == m)
+                return true ;
+        return false ;
+    }
+};
+//https://cp-algorithms.com/string/z-function.html#efficient-algorithm-to-compute-the-z-function
+/******************************************************************************************************************************************************************/
+
+
+
+
+
+
+/***********************************Disjoint Set Union(DSU)************************************************************************************************/
+class disjoint_set_union{
+public:
+    int parent[2001], size[2001] ;
+    int find_set(int v)
+    {
+        if(v == parent[v])
+            return v ;
+        return parent[v] = find_set(parent[v]) ;
+    }
+    void make_set(int v)
+    {
+        parent[v] = v, size[v] = 1 ;
+    }
+    void merge(int a, int b)
+    {
+        a = find_set(a) ;
+        b = find_set(b) ;
+        if(a != b)
+        {
+            if(size[a] >= size[b])
+            {
+                parent[b] = a, size[a] += size[b] ;
+            }
+            else
+            {
+                parent[a] = b, size[b] += size[a] ;
+            }
+        }
+    }
+};
+/*********************************************************************************************************************************************************************************/
+
+
+
+
+
+
+/***************************************** Simple Function **************************************************************************************************************************/
 int gcd(ll a, ll b)
 {
     if(b == 0)
@@ -83,19 +140,7 @@ int gcd(ll a, ll b)
     return gcd(b, a % b) ;
 }
 
-bool compare(pair<ll, int> &a, pair<ll, int> &b)
-{
-    return a.first <= b.first ;
-}
-
-
-
-
-struct s
-{
-    int x, y ;
-};
-bool check(ll x)
+bool check_Perfect_Square(ll x)  
 {
     ll p = sqrt(x) ;
     p = p - 1 >= 0 ? p - 1 : p ;
@@ -106,7 +151,7 @@ bool check(ll x)
     return p * p == x ? true : false ;
 }
 
-int pow(int a, int b)
+int pow(int a, int b) //return (a^b)%mod
 {
     if(b == 0)
         return 1 ;
@@ -117,7 +162,8 @@ int pow(int a, int b)
     }
     return (y * y) % mod;
 }
-ll pow(int x)
+
+ll pow(int x)  // return 2^x 
 {
     if(x == 0)
         return 1 ;
@@ -125,7 +171,6 @@ ll pow(int x)
         return pow(x / 2) * pow(x / 2) * 2 ;
     return pow(x / 2) * pow(x / 2) ;
 }
-
 
 bool check_prime(int n)
 {
@@ -141,33 +186,18 @@ bool check_prime(int n)
     return true ;
 }
 
+void yes()
+{
+    cout << "YES" << '\n' ;
+}
 
-// Do not quit
-// Keep trying, you're close
-// No looking at standings
-// Atleat C
-// Try D
+void no()
+{
+    cout << "NO" << '\n' ;
+}
+/***************************************************************************************************************************************************************************************/
 
 
-// ll power(ll a ,ll b){
-//     if(b==0)
-//         return 1 ;
-//     ll temp=power(a,b/2) ;
-//     temp=(temp*temp)%mod ;
-//     if(b&1)
-//         return (temp*a)%mod ;
-//     else
-//         return temp ;
-// }
-// ll solve(ll n ,ll k){
-//     if(k==0)
-//         return 1;
-//     ll ans=power(2,n*k-n) ;
-//     ll temp=(p-1) ;
-//     temp=(temp*solve(n,k-1))%mod ;
-//     ans=(ans+temp)%mod ;
-//     return ans ;
-// }
 
 // void dfs(vector<vector<int>> &v, int i, bool visited[], stack<int> &s)
 // {
@@ -194,71 +224,53 @@ bool check_prime(int n)
 //     }
 // }
 
-// const int maxm = 200001 ;
-// int parent[maxm], size_[maxm] ;
-// int parent1[maxm], size_1[maxm] ;
-// int find_set(int v)
-// {
-//     if(v == parent[v])
-//         return v ;
-//     return parent[v] = find_set(parent[v]) ;
-// }
-// void make_set(int v)
-// {
-//     parent[v] = v, size_[v] = 1 ;
-// }
-// void merge(int a, int b)
-// {
-//     a = find_set(a) ;
-//     b = find_set(b) ;
-//     if(a != b)
-//     {
-//         if(size_[a] >= size_[b])
-//         {
-//             parent[b] = a, size_[a] += size_[b] ;
-//         }
-//         else
-//         {
-//             parent[a] = b, size_[b] += size_[a] ;
-//         }
-//     }
-// }
 
-#define int long long
+
+
+
+
+
+// Do not quit
+// Keep trying, you're close
+// No looking at standings
+// Atleat C
+// Try D
 #define ppi pair<pair<int,int>,int>
 #define pi  pair<int,int>
 //const int maxm = 2 * (int)(1e5) + 2 ;
+//#define int long long
 
-int dp[501][501] ;
 
-int solve(int a[], int b[], int n, int l, int k ,int index){
-    if(dp[index][k]!=-1)
-        return dp[index][k] ;
-    if(index==n){
-      return 0 ;
-    }
-    int res=INT_MAX ;
-    for(int i=0;i<=k&&index+i+1<=n;i++){
-       if(index+i+1==n)
-         res=min(res,b[index]*(l-a[index])+solve(a,b,n,l,k-i,index+i+1)) ;
-       else
-        res=min(res,b[index]*(a[index+i+1]-a[index])+solve(a,b,n,l,k-i,index+i+1)) ;
-    }
-    return dp[index][k]=res ;
-}
+
 
 void main_()
-{   memset(dp,-1,sizeof(dp)) ;
-    int n, l, k ;
-    cin >> n >> l >> k ;
-    int a[n], b[n];
-    for(int i = 0; i < n; i++)
-        cin >> a[i] ;
-    for(int i = 0; i < n; i++)
-        cin >> b[i] ;
-    cout<<solve(a,b,n,l,k,0)<<'\n' ;      
+{
+  string s ;cin>>s ;
+  int n=s.size() ;
+  if(n==1)
+  {
+    cout<<"Just a legend" ;
+    return ;
+  }
+  z_algorithm obj ;
+  vector<int>z=obj.Z_array_generate(s);
+  vector<int>maxm(n) ;
+  maxm[0]=0 ;
+  for(int i=1;i<n;i++)
+     maxm[i]=max(maxm[i-1],z[i]) ;
+  int ans=0 ;
+  for(int i=n-1;i>=1;i--)
+  {
+    if(z[i]==n-i&&maxm[i-1]>=z[i])
+        ans=z[i] ;
+  }
+  // for(auto x:z)
+  //   cout<<x<<' ';
+  if(ans>0)
+  cout<<s.substr(0,ans);
+  else
+   cout<<"Just a legend" ; 
 }
-
 
 signed main()
 {
@@ -273,7 +285,7 @@ signed main()
 #endif
 
     int test = 1 ;
-   // cin >> test ;
+    //cin >> test ;
     while(test--)
     {
         main_();
